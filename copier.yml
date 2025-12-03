@@ -1,16 +1,17 @@
 _min_copier_version: "9.4.0"
 
-_answers_file: .copier-answers.yml
+_answers_file: .speculate/copier-answers.yml
 
-# Only copy docs/ directory using negation patterns (gitignore-style)
-# First exclude everything, then whitelist only root-level docs/
+# Only copy docs/ and .speculate/ directories using negation patterns (gitignore-style)
+# First exclude everything, then whitelist what we want
 # The leading / anchors the pattern to the template root
 _exclude:
   # Exclude everything, then whitelist what we want
   - "**"
   - "!/docs"
   - "!/docs/**"
-  - "!/.copier-answers.yml"
+  - "!/.speculate"
+  - "!/.speculate/**"
 
 _message_after_copy: |
   Speculate docs installed!

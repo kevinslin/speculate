@@ -45,8 +45,10 @@ class TestUpdateSpeculateSettings:
         assert "last_update" in settings
 
     def test_reads_docs_version_from_copier_answers(self, tmp_path: Path):
-        """Should read docs version from .copier-answers.yml."""
-        copier_answers = tmp_path / ".copier-answers.yml"
+        """Should read docs version from .speculate/copier-answers.yml."""
+        speculate_dir = tmp_path / ".speculate"
+        speculate_dir.mkdir()
+        copier_answers = speculate_dir / "copier-answers.yml"
         copier_answers.write_text(yaml.dump({"_commit": "v1.2.3", "_src_path": "gh:test/repo"}))
 
         _update_speculate_settings(tmp_path)
@@ -165,7 +167,9 @@ class TestStatusCommand:
         docs_dir = tmp_path / "docs"
         docs_dir.mkdir()
         # Create copier-answers so it doesn't fail on that first
-        (tmp_path / ".copier-answers.yml").write_text(
+        speculate_dir = tmp_path / ".speculate"
+        speculate_dir.mkdir()
+        (speculate_dir / "copier-answers.yml").write_text(
             yaml.dump({"_commit": "abc123", "_src_path": "test"})
         )
 
@@ -176,7 +180,7 @@ class TestStatusCommand:
         assert exc_info.value.code == 1
 
     def test_fails_without_copier_answers(self, tmp_path: Path, monkeypatch: MonkeyPatch):
-        """Should fail if .copier-answers.yml is missing."""
+        """Should fail if .speculate/copier-answers.yml is missing."""
         docs_dir = tmp_path / "docs"
         docs_dir.mkdir()
         (docs_dir / "development.md").write_text("# Development")
@@ -188,11 +192,13 @@ class TestStatusCommand:
         assert exc_info.value.code == 1
 
     def test_succeeds_with_all_required_files(self, tmp_path: Path, monkeypatch: MonkeyPatch):
-        """Should succeed if development.md and .copier-answers.yml exist."""
+        """Should succeed if development.md and .speculate/copier-answers.yml exist."""
         docs_dir = tmp_path / "docs"
         docs_dir.mkdir()
         (docs_dir / "development.md").write_text("# Development")
-        (tmp_path / ".copier-answers.yml").write_text(
+        speculate_dir = tmp_path / ".speculate"
+        speculate_dir.mkdir()
+        (speculate_dir / "copier-answers.yml").write_text(
             yaml.dump({"_commit": "abc123", "_src_path": "test"})
         )
 

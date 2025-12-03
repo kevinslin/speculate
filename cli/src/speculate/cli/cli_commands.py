@@ -39,6 +39,15 @@ def _load_yaml(path: Path) -> dict[str, Any]:
     return cast(dict[str, Any], result) if isinstance(result, dict) else {}
 
 
+# Package name for version lookup (PyPI package name)
+PACKAGE_NAME = "speculate-cli"
+
+# Speculate configuration paths (all under .speculate/)
+SPECULATE_DIR = ".speculate"
+COPIER_ANSWERS_FILE = f"{SPECULATE_DIR}/copier-answers.yml"
+SETTINGS_FILE = f"{SPECULATE_DIR}/settings.yml"
+
+
 def init(
     destination: str = ".",
     overwrite: bool = False,
@@ -48,7 +57,7 @@ def init(
     """Initialize docs in a project using Copier.
 
     Copies the docs/ directory from the speculate template into your project.
-    Creates a .copier-answers.yml file for future updates.
+    Creates .speculate/copier-answers.yml for future updates.
 
     By default, always pulls from the latest commit (HEAD) so docs updates
     don't require new CLI releases. Use --ref to update to a specific version.
@@ -129,17 +138,18 @@ def update() -> None:
     import copier  # Lazy import - large package
 
     cwd = Path.cwd()
-    answers_file = cwd / ".copier-answers.yml"
+    answers_file = cwd / COPIER_ANSWERS_FILE
 
     if not answers_file.exists():
         print_error(
-            "No .copier-answers.yml found", "Run `speculate init` first to initialize docs."
+            f"No {COPIER_ANSWERS_FILE} found",
+            "Run `speculate init` first to initialize docs.",
         )
         raise SystemExit(1)
 
     print_header("Updating docs from upstream template...", cwd)
 
-    _ = copier.run_update(str(cwd), conflict="inline")
+    _ = copier.run_update(str(cwd), answers_file=str(answers_file), conflict="inline")
 
     rprint()
     print_success("Docs updated successfully!")
@@ -207,7 +217,7 @@ def status() -> None:
     """Show current template version and sync status.
 
     Displays:
-      - Template version from .copier-answers.yml
+      - Template version from .speculate/copier-answers.yml
       - Last install info from .speculate/settings.yml
       - Whether docs/ exists
       - Whether development.md exists (required)
@@ -223,8 +233,8 @@ def status() -> None:
 
     print_header("Speculate Status", cwd)
 
-    # Check .copier-answers.yml (required for update)
-    answers_file = cwd / ".copier-answers.yml"
+    # Check copier answers file (required for update)
+    answers_file = cwd / COPIER_ANSWERS_FILE
     if answers_file.exists():
         answers = _load_yaml(answers_file)
         commit = answers.get("_commit", "unknown")
@@ -233,20 +243,20 @@ def status() -> None:
         print_detail(f"Source: {src}")
     else:
         print_error_item(
-            ".copier-answers.yml missing (required!)",
+            f"{COPIER_ANSWERS_FILE} missing (required!)",
             "Run `speculate init` to initialize docs.",
         )
         has_errors = True
 
-    # Check .speculate/settings.yml
-    settings_file = cwd / ".speculate" / "settings.yml"
+    # Check settings file
+    settings_file = cwd / SETTINGS_FILE
     if settings_file.exists():
         settings = _load_yaml(settings_file)
         last_update = settings.get("last_update", "unknown")
         cli_version = settings.get("last_cli_version", "unknown")
         print_success(f"Last install: {last_update} (CLI {cli_version})")
     else:
-        print_info(".speculate/settings.yml not found")
+        print_info(f"{SETTINGS_FILE} not found")
 
     # Check docs/
     docs_path = cwd / "docs"
@@ -291,9 +301,9 @@ def status() -> None:
 
 def _update_speculate_settings(project_root: Path) -> None:
     """Create or update .speculate/settings.yml with install metadata."""
-    settings_dir = project_root / ".speculate"
+    settings_dir = project_root / SPECULATE_DIR
     settings_dir.mkdir(parents=True, exist_ok=True)
-    settings_file = settings_dir / "settings.yml"
+    settings_file = project_root / SETTINGS_FILE
 
     # Read existing settings
     settings: dict[str, Any] = _load_yaml(settings_file) if settings_file.exists() else {}
@@ -301,19 +311,19 @@ def _update_speculate_settings(project_root: Path) -> None:
     # Update with current info
     settings["last_update"] = datetime.now(UTC).isoformat()
     try:
-        settings["last_cli_version"] = version("speculate")
+        settings["last_cli_version"] = version(PACKAGE_NAME)
     except Exception:
         settings["last_cli_version"] = "unknown"
 
-    # Get docs version from .copier-answers.yml if available
-    answers_file = project_root / ".copier-answers.yml"
+    # Get docs version from copier answers file if available
+    answers_file = project_root / COPIER_ANSWERS_FILE
     if answers_file.exists():
         answers = _load_yaml(answers_file)
         settings["last_docs_version"] = answers.get("_commit", "unknown")
 
     with atomic_output_file(settings_file) as temp_path:
         Path(temp_path).write_text(yaml.dump(settings, default_flow_style=False))
-    print_success("Updated .speculate/settings.yml")
+    print_success(f"Updated {SETTINGS_FILE}")
 
 
 def _get_dir_stats(path: Path) -> tuple[int, int]:

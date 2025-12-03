@@ -18,6 +18,7 @@ from speculate.cli.cli_commands import init, install, status, update
 from speculate.cli.cli_ui import print_cancelled, print_error
 
 APP_NAME = "speculate"
+PACKAGE_NAME = "speculate-cli"  # PyPI package name for version lookup
 DESCRIPTION = "speculate: Install and sync agent documentation"
 
 ALL_COMMANDS = [init, update, install, status]
@@ -25,7 +26,7 @@ ALL_COMMANDS = [init, update, install, status]
 
 def get_version_name() -> str:
     try:
-        return f"{APP_NAME} v{version(APP_NAME)}"
+        return f"{APP_NAME} v{version(PACKAGE_NAME)}"
     except Exception:
         return f"{APP_NAME} (unknown version)"
 
