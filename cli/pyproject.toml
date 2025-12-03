@@ -1,13 +1,13 @@
 # ---- Project Info and Dependencies ----
 
 [project.urls]
-Repository = "https://github.com/jlevy/speculate"
+Repository = "https://github.com/jlevy/speculate-cli"
 # Homepage = "https://..."
 # Documentation = "https://..."
 
 [project]
-name = "speculate"
-description = "Install and sync agent documentation for Cursor, Claude Code, Codex"
+name = "speculate-cli"
+description = "Structured agent specs, shortcuts, and doc workflows"
 authors = [
     { name="Joshua Levy", email="joshua@cal.berkeley.edu" },
 ]

@@ -1,6 +1,6 @@
-# speculate
+# speculate-cli
 
-This is a Python-based CLI for the Speculate project structure.
+This is the Python-based CLI for the Speculate project structure.
 
 * * *
 

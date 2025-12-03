@@ -787,7 +787,7 @@ wheels = [
 ]
 
 [[package]]
-name = "speculate"
+name = "speculate-cli"
 source = { editable = "." }
 dependencies = [
     { name = "clideps" },

@@ -6,4 +6,4 @@ package_author_name: Joshua Levy
 package_description: Structured agent specs, shortcuts, and doc workflows
 package_github_org: jlevy
 package_module: speculate
-package_name: speculate
+package_name: speculate-cli
