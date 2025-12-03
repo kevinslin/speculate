@@ -2,9 +2,9 @@
 
 **Speculate** is a **project structure for spec-driven agent coding**.
 
-It includes **common rules, templates, and shortcut prompts** that help any coding agent
-like Claude Code, Codex, or Cursor plan better using specs, follow more defined
-processes that result in better code.
+It includes **common rules, templates, and shortcut prompts** (in the [docs/](docs/)
+folder) that help any coding agent like Claude Code, Codex, or Cursor plan better using
+specs, follow more defined processes that result in better code.
 You can browse these in the [docs/](docs/) folder.
 
 Speculate also includes a **CLI tool**, `speculate`, that helps copy and update these
@@ -33,7 +33,7 @@ At first, unsurprisingly, after the codebase grew, we saw lots of slop code and
 painfully stupid bugs.
 This really isn’t surprising: the training data for LLMs includes mostly mediocre code.
 Even worse, just like with human engineers, if you let an agent ship poor code, that one
-bad bit code encourages the next agent to repeat the problem.
+bad bit of code encourages the next agent to repeat the problem.
 
 Without good examples and careful prompting, even the best agents perpetuate terrible
 patterns and rapidly proliferate unnecessary complexity.
@@ -71,7 +71,7 @@ For example, agents will routinely
 - Compound one poor design choice on top of another repeatedly, until it’s a Rube
   Goldberg machine where the whole design needs to be simplified immensely
 
-- Make fundamental incorrect assumptions about a problem if you have not been
+- Make fundamental incorrect assumptions about a problem if the you have not been
   sufficiently explicit (and unless prompted, not check with you about it)
 
 - Invent features that don’t exist in tools and libraries, wasting large amounts of time
@@ -84,7 +84,7 @@ But we used all these problems as a chance to get more disciplined and improve
 processes—much like you would with a human engineering team.
 
 The first area of improvement was **more rigorous development processes**. We moved most
-coding to specification-driven developent.
+coding to specification-driven development.
 We broke specs into planning, implementation, and validation stages for more precision.
 We enforced strict coding rules at commit time to reduce common bugs we saw agents
 introduce.
@@ -99,7 +99,7 @@ system, several kinds of specs for planning, implementation, and validation, and
 shortcut docs that define process.
 
 The workflows are fairly complex.
-But it’s exactly these rules and processes that give significant improvents in both
+But it’s exactly these rules and processes that give significant improvements in both
 speed and code quality.
 The codebase grew quickly, but the more good structure we added, the more maintainable
 it became.
@@ -124,7 +124,7 @@ the kind of engineering, the process, and the engineering experience of the team
 We are still evolving it, but we have found this agent coding structure extremely
 helpful for certain kinds of development.
 It likely works best for very small teams of senior engineers working on feature-rich
-products, but parts of this process can likely be adapted to other situations too.
+products. But parts of this process can likely be adapted to other situations too.
 
 ## Advantages of Spec-Driven Coding
 
@@ -208,9 +208,22 @@ The key insights for this approach are:
 
 ## Documentation Layout
 
+### Key Docs
+
+- **`docs/docs-overview.md`** is a high-level roadmap of every rule, shortcut, and spec.
+  The general agent rules should always point to this first.
+
+- **`docs/development.md`** is your concise project-specific setup: This should cover
+  your key developer workflows to format, lint, test, and release.
+  A simple example (`docs/development.npm.sample.md`) ships in the repo; copy or rewrite
+  it as `docs/development.md` and keep it current so agents know exactly how to build
+  and validate the project.
+
+### Folder Structure
+
 ```
 docs/
-├── development.md              # You create this! Setup, build, lint, test workflows
+├── development.md              # Start here! Setup, build, lint, test workflows
 ├── docs-overview.md            # Summary for agents to read first
 │
 ├── general/                    # Shared across repos (synced via `speculate update`)
@@ -251,7 +264,7 @@ docs/
 
 The Speculate structure has folders for several kinds in your repo.
 
-All docs these docs fall into two categories
+All docs fall into two categories:
 
 - **general docs** (`docs/general`) that are shared across repos and you typically don’t
   need to modify
@@ -269,12 +282,11 @@ Then there are several kinds of docs:
   validation. Sometimes a single doc is enough but for complex work, each phase should
   probably be a doc of its own, to manage context size.
 
-  - These last only a few days usually, and can be archived my moving them to the
+  - These last only a few days usually, and can be archived by moving them to the
     `docs/project/specs/done/` folder once they are done.
 
-  - In our workflows, we usually have specs with a prefix and a date
-    (`plan-YYYY-MM-DD-*.md`, `impl-YYYY-MM-DD-*.md`, `valid-YYYY-MM-DD-*.md`). Bugfixes
-    can use their own template as well.
+  - In our workflows, we usually have three, each with a prefix and a date
+    (`plan-YYYY-MM-DD-*.md`, `impl-YYYY-MM-DD-*.md`, `valid-YYYY-MM-DD-*.md`).
 
   - A good length is 500-800 lines of (linewrapped) Markdown: small enough both you and
     the agent can read fairly quickly.
@@ -285,7 +297,7 @@ Then there are several kinds of docs:
   all the rate limits of all providers you use as well as the best libraries to use for
   rate limiting.
 
-  - They are long lived but may not be maintained unless needed.
+  - They are long-lived but may not be maintained unless needed.
 
   - These can be any length but can link heavily.
     They need to be exhaustive at least in terms of links.
@@ -344,7 +356,7 @@ The CLI workflow is really just a convenience to copy and update docs.
 It is helpful in three use cases currently:
 
 - **Initialization:** The first task is to set up initial docs into your repo.
-  The `speculate init` command copies of all general docs as Markdown docs into a
+  The `speculate init` command copies all general docs as Markdown docs into a
   `docs/general` directory in your repo.
   It also sets up a `docs/project` skeleton directory where you can place the
   project-specific docs.
@@ -499,7 +511,7 @@ in other ways for the past 2 years, we do have some take-aways:
    errors sometimes.
 
 2. Spec-driven development like this is most effective if you’re a fairly senior
-   engineer already and can agressively correct the agent during spec writing and when
+   engineer already and can aggressively correct the agent during spec writing and when
    reviewing code.
 
 3. It is also most effective for full-stack or product engineering, where the main
@@ -530,9 +542,8 @@ in other ways for the past 2 years, we do have some take-aways:
 
 ## Installing to Claude Code, Codex, and Cursor
 
-The source of truth for all rules is `docs/general/agent-rules/`. After running
-`speculate init`, these rules are installed into your repo and consumed by different
-tools via their native configuration formats:
+The source of truth for all rules is `docs/general/agent-rules/`. These rules are
+consumed by different tools via their native configuration formats:
 
 | Tool | Configuration File | How Rules Are Loaded |
 | --- | --- | --- |
@@ -542,7 +553,7 @@ tools via their native configuration formats:
 
 ### Cursor Setup
 
-For Cursor, create symlinks (or copies) from `.cursor/rules/` to the docs:
+For Cursor, create symlinks from `.cursor/rules/` to the docs:
 
 ```bash
 mkdir -p .cursor/rules
@@ -552,8 +563,8 @@ ln -s ../../docs/general/agent-rules/*.md .
 
 ### Claude Code and Codex Setup
 
-Create root-level `CLAUDE.md` and `AGENTS.md` files that point agents to read rules from
-@docs/general/agent-rules/.
+The root-level `CLAUDE.md` and `AGENTS.md` files point agents to read rules from
+@docs/general/agent-rules/. No additional setup needed.
 
 ### Automatic Workflow Activation
 
@@ -561,8 +572,35 @@ The @automatic-shortcut-triggers.md file enables automatic shortcut triggering.
 When an agent receives a request, it checks the trigger table and uses the appropriate
 shortcut from `docs/general/agent-shortcuts/`.
 
-You can also invoke shortcuts explicitly by just referencing them (e.g. typing `@` and
-selecting `shortcut:new-plan-spec.md`).
+## Agent Task Shortcuts
+
+Shortcuts in `docs/general/agent-shortcuts/` define reusable workflows.
+They are triggered automatically via @automatic-shortcut-triggers.md or can be invoked
+explicitly.
+
+### Direct Invocation
+
+You can also invoke shortcuts explicitly:
+
+- @shortcut:new-plan-spec.md — Create a new feature plan
+
+- @shortcut:new-implementation-spec.md — Create an implementation spec
+
+- @shortcut:new-validation-spec.md — Create a validation spec
+
+- @shortcut:new-research-brief.md — Create a new research brief
+
+- @shortcut:new-architecture-doc.md — Create a new architecture document
+
+- @shortcut:revise-architecture-doc.md — Revise an existing architecture document
+
+- @shortcut:implement-spec.md — Implement from an existing spec
+
+- @shortcut:precommit-process.md — Run pre-commit checks
+
+- @shortcut:commit-code.md — Prepare commit message
+
+- @shortcut:create-pr.md — Create a pull request
 
 ### Automatic Triggering
 
