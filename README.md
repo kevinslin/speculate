@@ -11,6 +11,31 @@ option to update rules that are improved in the future.
 I’ve grown to use this process heavily for some recent projects so have pulled this into
 an open source repository.
 
+## Motivation
+
+The advantages of the Speculate project structure are:
+
+- **Shared context:** As multiple human developers both work with LLMs, it allows all
+  people and tools to have appropriate context
+
+- **Decomposition of tasks:** By decomposing common tasks in to clear, well-organized
+  processes, it allows greater flexibility in reusing instructions and rules
+
+- **Reduced context:** Decomposition allows smaller context and this allows more
+  reliable adherence to rules and guardrails
+
+This avoids common pitfalls when developing with LLMs:
+
+- Losing track of context on larger features or bugfixes
+
+- Identifying ambiguous features early and clarifying with the user
+
+- Using wrong tools or not following processes appropriate to a given project
+
+- Using wrong or out of date SDKs
+
+- Making poorly thought through architectural choices that lead to needless complication
+
 ## Installing the CLI
 
 The `speculate` CLI is published on PyPI as
@@ -38,31 +63,6 @@ The goal of this agent structure is to improve speed *and* quality of developmen
 individuals teams working with LLM agents in Claude Code, Codex, Cursor, Windsurf, etc.
 I’ve primarily used this myself or with one other engineer, so only really have
 experience with small teams, but have found it extremely helpful.
-
-## Advantages
-
-The advantages of the Speculate project structure are:
-
-- **Shared context:** As multiple human developers both work with LLMs, it allows all
-  people and tools to have appropriate context
-
-- **Decomposition of tasks:** By decomposing common tasks in to clear, well-organized
-  processes, it allows greater flexibility in reusing instructions and rules
-
-- **Reduced context:** Decomposition allows smaller context and this allows more
-  reliable adherence to rules and guardrails
-
-This avoids common pitfalls when developing with LLMs:
-
-- Losing track of context on larger features or bugfixes
-
-- Identifying ambiguous features early and clarifying with the user
-
-- Using wrong tools or not following processes appropriate to a given project
-
-- Using wrong or out of date SDKs
-
-- Making poorly thought through architectural choices that lead to needless complication
 
 ## Documentation Layout
 
