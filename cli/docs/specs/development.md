@@ -101,23 +101,46 @@ Since this is a monorepo, CLI tags use the `cli-v` prefix.
 **Release process:**
 
 ```shell
-# 1. Ensure all tests pass
-make test
+# 1. Ensure all tests pass and CI is green
+make lint && make test
+git push  # Push any pending commits
+gh run list --limit 1  # Verify CI passed
 
-# 2. Create a git tag with the cli-v prefix
-git tag cli-v0.1.0
+# 2. Check current releases to determine next version
+gh release list --limit 3
 
-# 3. Push the tag to GitHub
-git push origin cli-v0.1.0
+# 3. Create a GitHub release with the cli-v prefix tag
+#    This creates the tag and release in one step
+gh release create cli-v0.0.6 --title "CLI v0.0.6" --notes-file /path/to/notes.md
+# Or with inline notes:
+gh release create cli-v0.0.6 --title "CLI v0.0.6" --notes "Release notes here"
 
-# 4. Create a GitHub release from the tag
-#    Go to: https://github.com/jlevy/speculate/releases/new
-#    Select the cli-v0.1.0 tag and publish the release
+# 4. Monitor the publish workflow
+gh run list --limit 1  # Find the publish run ID
+gh run watch <run-id> --exit-status  # Wait for completion
 
-# 5. The publish.yml workflow will automatically:
-#    - Run tests
-#    - Build the package
-#    - Publish to PyPI using trusted publishing (OIDC)
+# 5. Verify the release is on PyPI
+curl -s https://pypi.org/pypi/speculate-cli/json | python3 -c \
+  "import sys,json; print(json.load(sys.stdin)['info']['version'])"
+
+# 6. Test the new version
+uv tool install --force speculate-cli
+speculate --version
+```
+
+**Release notes format:**
+
+```markdown
+## What's New
+
+- Brief description of changes
+
+### Features
+- Feature 1
+- Feature 2
+
+### Full Changelog
+https://github.com/jlevy/speculate/compare/cli-v0.0.5...cli-v0.0.6
 ```
 
 **Version format:**
