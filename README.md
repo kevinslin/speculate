@@ -53,40 +53,40 @@ This avoids common pitfalls when developing with LLMs:
 After using this structure heavily for the past 2-3 months as well as using coding tools
 in other ways for the past 2 years, we do have some take-aways:
 
-- Agent coding is changing ridiculously quickly and it has improved a lot just since
-  mid-2025. But none of this is foolproof.
-  Even the best agents like Claude Sonnet 4.5 and GPT-5 Codex High make really stupid
-  errors sometimes.
+1. Agent coding is changing ridiculously quickly and it has improved a lot just since
+   mid-2025. But none of this is foolproof.
+   Even the best agents like Claude Sonnet 4.5 and GPT-5 Codex High make really stupid
+   errors sometimes.
 
-- Spec-driven development like this is most effective if you’re a fairly senior engineer
-  already and can agressively correct the agent during spec writing and when reviewing
-  code.
+2. Spec-driven development like this is most effective if you’re a fairly senior
+   engineer already and can agressively correct the agent during spec writing and when
+   reviewing code.
 
-- It is also most effective for full-stack or product engineering, where the main
-  challenge is implementing everything in a flexible way.
-  Visually intensive frontend engineering and “harder” algorithmic, infrastructure, or
-  machine learning engineering still seem better suited to iteratively writing code by
-  hand.
+3. It is also most effective for full-stack or product engineering, where the main
+   challenge is implementing everything in a flexible way.
+   Visually intensive frontend engineering and “harder” algorithmic, infrastructure, or
+   machine learning engineering still seem better suited to iteratively writing code by
+   hand.
 
-- Even if you are writing code by hand, the processes for writing research briefs and
-  architecture docs is still useful.
-  Agents are great at maintaining docs!
+4. Even if you are writing code by hand, the processes for writing research briefs and
+   architecture docs is still useful.
+   Agents are great at maintaining docs!
 
-- For product engineering, you can often get away with writing very little code manually
-  if the spec docs are reviewed.
-  With good templates and examples, you can chat with the agent to write the specs as
-  well. But you do have to actually read the spec docs and review the code!
+5. For product engineering, you can often get away with writing very little code
+   manually if the spec docs are reviewed.
+   With good templates and examples, you can chat with the agent to write the specs as
+   well. But you do have to actually read the spec docs and review the code!
 
-- But with some discipline this appraoch is really powerful.
-  Contrary to what some say, we have found it doesn’t lead to buggy, dangerous, and
-  unmaintainable code the way blindly vibe coding does.
-  And it is much faster than writing the same code fully by hand.
+6. But with some discipline this appraoch is really powerful.
+   Contrary to what some say, we have found it doesn’t lead to buggy, dangerous, and
+   unmaintainable code the way blindly vibe coding does.
+   And it is much faster than writing the same code fully by hand.
 
-- Avoid testing cycles that are manual!
-  It’s best to combine this approach with an architecture that makes testing really
-  easy. If at all possible, insist on architectures where all tasks are easy to run from
-  the command line. Insist on mockable APIs and databases, so even integration testing is
-  easy from the command line.
+7. Avoid testing cycles that are manual!
+   It’s best to combine this approach with an architecture that makes testing really
+   easy. If at all possible, insist on architectures where all tasks are easy to run from
+   the command line. Insist on mockable APIs and databases, so even integration testing
+   is easy from the command line.
 
 ## Organization and Principles
 
@@ -200,100 +200,102 @@ If you don’t use [uv](https://docs.astral.sh/uv/), you can also install with p
 With just these templates and shortcut docs and disciplined workflows, you can do quite
 a few things. Here is an example that shows the main shortcuts and doc types:
 
-- You install the CLI and run `speculate init` from within your repo.
-  This copies a bunch of docs into a `docs/` folder.
-  (You only do this once but you can also run `speculate update` in the future if you
-  want to update docs after the Speculate repo changes.)
+1. You install the CLI and run `speculate init` from within your repo.
+   This copies a bunch of docs into a `docs/` folder.
+   (You only do this once but you can also run `speculate update` in the future if you
+   want to update docs after the Speculate repo changes.)
 
-- You want to add a new feature or perform a task like a refactor.
-  The first step is to plan it.
-  Reference
-  [shortcut:new-plan-spec.md](docs/general/agent-shortcuts/shortcut:new-plan-spec.md)
-  (just hit `@` and type `new-plan` and it’s generally sufficient) and give your agent
-  of choice (Claude Code, Codex, or Cursor) an initial description of what you want.
-  The agent will read this shortcut doc, follow the listed steps to find the plan spec
-  template doc, and fill it in a plan using the information you’ve given.
-  You can review and iterate on the spec.
-  Because of the shortcut instructions it will be placed at
-  `docs/project/specs/active/plan-YYYY-MM-DD-some-feature.md`. Keep chatting and
-  reviewing the plan until the it looks like it is a reasonable background, motivation,
-  and general architecture changes.
+2. You want to add a new feature or perform a task like a refactor.
+   The first step is to plan it.
+   Reference
+   [shortcut:new-plan-spec.md](docs/general/agent-shortcuts/shortcut:new-plan-spec.md)
+   (just hit `@` and type `new-plan` and it’s generally sufficient) and give your agent
+   of choice (Claude Code, Codex, or Cursor) an initial description of what you want.
+   The agent will read this shortcut doc, follow the listed steps to find the plan spec
+   template doc, and fill it in a plan using the information you’ve given.
+   You can review and iterate on the spec.
+   Because of the shortcut instructions it will be placed at
+   `docs/project/specs/active/plan-YYYY-MM-DD-some-feature.md`. Keep chatting and
+   reviewing the plan until the it looks like it is a reasonable background, motivation,
+   and general architecture changes.
 
-- Typically you’d then do a more detailed implementation plan that pulls in more code
-  for context and maps out what parts of the codebase need to change.
-  Reference
-  [shortcut:new-implementation-spec.md](docs/general/agent-shortcuts/shortcut:new-implementation-spec.md)
-  and the agent then copies the implementation spec template and fills that in based on
-  what’s been done in the planning spec.
+3. Typically you’d then do a more detailed implementation plan that pulls in more code
+   for context and maps out what parts of the codebase need to change.
+   Reference
+   [shortcut:new-implementation-spec.md](docs/general/agent-shortcuts/shortcut:new-implementation-spec.md)
+   and the agent then copies the implementation spec template and fills that in based on
+   what’s been done in the planning spec.
 
-- Once the plan and implementation specs are ready.
-  Reference
-  [shortcut:implement-spec.md](docs/general/agent-shortcuts/shortcut:implement-spec.md)
-  with the spec in context, and it will then begin implementation.
+4. Once the plan and implementation specs are ready.
+   Reference
+   [shortcut:implement-spec.md](docs/general/agent-shortcuts/shortcut:implement-spec.md)
+   with the spec in context, and it will then begin implementation.
 
-- Say during this process you notice you’ve made some poor architecture choices because
-  you didn’t research available libraries or fully reference the right parts of the
-  codebase well enough in the implementation plan.
-  It’s time to do more research and analysis.
-  You reference
-  [shortcut:new-research-brief.md](docs/general/agent-shortcuts/shortcut:new-research-brief.md)
-  and tell it to research all available alternative libraries and save the research
-  brief. Iterate on this doc until satisfied.
-  Make sure it has good links and background.
+5. Say during this process you notice you’ve made some poor architecture choices because
+   you didn’t research available libraries or fully reference the right parts of the
+   codebase well enough in the implementation plan.
+   It’s time to do more research and analysis.
+   You reference
+   [shortcut:new-research-brief.md](docs/general/agent-shortcuts/shortcut:new-research-brief.md)
+   and tell it to research all available alternative libraries and save the research
+   brief. Iterate on this doc until satisfied.
+   Make sure it has good links and background.
 
-- Now you have an idea of what library to use but are not sure of how many places in the
-  codebase need to change.
-  Your codebase has gotten quite large and it’s getting confusing, so you tell the agent
-  to write a full architecture summary by referencing
-  [shortcut:new-architecture-doc.md](docs/general/agent-shortcuts/shortcut:new-architecture-doc.md).
-  The agent looks through the codebase and you iterate to improve the architecture doc.
+6. Now you have an idea of what library to use but are not sure of how many places in
+   the codebase need to change.
+   Your codebase has gotten quite large and it’s getting confusing, so you tell the
+   agent to write a full architecture summary by referencing
+   [shortcut:new-architecture-doc.md](docs/general/agent-shortcuts/shortcut:new-architecture-doc.md).
+   The agent looks through the codebase and you iterate to improve the architecture doc.
 
-- Now return to your plan spec, reference them, and tell the agent to reference both the
-  research brief and the architecture doc, and revise the plan spec, including the
-  architecture doc as background.
-  Reference
-  [shortcut:implement-spec.md](docs/general/agent-shortcuts/shortcut:implement-spec.md).
+7. Now return to your plan spec, reference them, and tell the agent to reference both
+   the research brief and the architecture doc, and revise the plan spec, including the
+   architecture doc as background.
+   Reference
+   [shortcut:implement-spec.md](docs/general/agent-shortcuts/shortcut:implement-spec.md).
 
-- Repeat with the implementation plan spec.
-  Now we are ready to try implementing again.
+8. Repeat with the implementation plan spec.
+   Now we are ready to try implementing again.
+   As you go, you want the agent to do more testing.
+   Reference rules docs like
+   [general-tdd-guidelines.md](docs/general/agent-guidelines/general-tdd-guidelines.md)
+   and tell it to be stricter about test-driven development.
 
-- As you go, you want the agent to do more testing.
-  Reference rules docs like
-  [general-tdd-guidelines.md](docs/general/agent-guidelines/general-tdd-guidelines.md)
-  and tell it to be stricter about test-driven development.
+9. Finally you’re at an initial stopping point and tests are passing.
+   Reference
+   [shortcut:commit-code.md](docs/general/agent-shortcuts/shortcut:commit-code.md) to
+   commit. These instructions tell the agent to
 
-- Finally you’re at an initial stopping point and tests are passing.
-  Reference
-  [shortcut:commit-code.md](docs/general/agent-shortcuts/shortcut:commit-code.md) to
-  commit. These instructions tell the agent to
+   - Run all linting and tests and fix everything
 
-  1. Run all linting and tests and fix everything
+   - Review code and make sure it complies with relevant coding rules
 
-  2. Review code and make sure it complies with relevant coding rules
+   - Run all tests again after review edits
 
-  3. Run all tests again after review edits
+   - Backfill the specs so we know they are in sync with the code that is committed
 
-  4. Backfill the specs so we know they are in sync with the code that is committed
+   - Commit the code (fixing any commit hooks if something slipped through)
 
-  5. Commit the code (fixing any commit hooks if something slipped through)
+10. Repeat the processes above until the feature is getting complete.
+    Reference
+    [shortcut:new-validation-spec.md](docs/general/agent-shortcuts/shortcut:new-validation-spec.md)
+    to have it write a spec of what automated testing has been done and what needs to be
+    manually validated by you.
 
-- Repeat the processes above until the feature is getting complete.
-  Reference
-  [shortcut:new-validation-spec.md](docs/general/agent-shortcuts/shortcut:new-validation-spec.md)
-  to have it write a spec of what automated testing has been done and what needs to be
-  manually validated by you.
+11. Reference
+    [shortcut:create-pr.md](docs/general/agent-shortcuts/shortcut:create-pr.md) to
+    request the agent do a final review of all code on your branch and use `gh` to file
+    a PR that references the relevant parts of the validation spec.
+    You can now review the PR again, do manual testing, repeat the above steps as
+    desired.
 
-- Reference [shortcut:create-pr.md](docs/general/agent-shortcuts/shortcut:create-pr.md)
-  to request the agent do a final review of all code on your branch and use `gh` to file
-  a PR that references the relevant parts of the validation spec.
-  You can now review the PR again, do manual testing, repeat the above steps as desired.
+12. During this whole process, you can add more agent rules, research docs, template
+    improvements, etc. Agent coding is best when you iteratively improve processes all
+    the time!
 
-- During this whole process, you can add more agent rules, research docs, template
-  improvements, etc. Agent coding is best when you iteratively improve processes all the
-  time!
-
-- Finally, you can run `speculate update` to get updates to the shared general structure
-  in this repo. Conflicts are detected and you can deal with merges.
+13. Finally, you can run `speculate update` to get updates to the shared general
+    structure in this repo.
+    Conflicts are detected and you can deal with merges.
 
 That’s a bit complex.
 But it is also quite powerful.
