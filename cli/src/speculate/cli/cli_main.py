@@ -14,14 +14,14 @@ from clideps.utils.readable_argparse import ReadableColorFormatter, get_readable
 from rich import get_console
 from rich import print as rprint
 
-from speculate.cli.cli_commands import init, install, status, update
+from speculate.cli.cli_commands import init, install, status, uninstall, update
 from speculate.cli.cli_ui import print_cancelled, print_error
 
 APP_NAME = "speculate"
 PACKAGE_NAME = "speculate-cli"  # PyPI package name for version lookup
 DESCRIPTION = "speculate: Install and sync agent documentation"
 
-ALL_COMMANDS = [init, update, install, status]
+ALL_COMMANDS = [init, update, install, uninstall, status]
 
 
 def get_version_name() -> str:
@@ -98,6 +98,13 @@ def build_parser() -> argparse.ArgumentParser:
                 help="exclude rules matching pattern (supports * and **)",
             )
 
+        if func is uninstall:
+            subparser.add_argument(
+                "--force",
+                action="store_true",
+                help="skip confirmation prompt",
+            )
+
     return parser
 
 
@@ -128,6 +135,8 @@ def main() -> None:
             update()
         elif subcommand == "install":
             install(include=args.include, exclude=args.exclude)
+        elif subcommand == "uninstall":
+            uninstall(force=args.force)
         elif subcommand == "status":
             status()
         else:

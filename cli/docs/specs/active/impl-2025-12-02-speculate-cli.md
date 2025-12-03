@@ -25,7 +25,10 @@ The implementation is broken into phases that may be committed and tested separa
 
 - Phase 2: CLI Structure — Create cli_main.py and cli_commands.py with stubs
 
-- Phase 3: Command Implementations — Implement all four commands
+- Phase 3: Command Implementations — Implement init, update, install, status commands
+
+- Phase 3.5: Uninstall Command — Implement uninstall command with non-destructive
+  removal
 
 - Phase 4: Testing and Polish — Test all flows, lint, fix issues
 
@@ -300,6 +303,152 @@ No new libraries beyond Phase 1.
 
 - Interactive questionnaire
 
+## Phase 3.5: Uninstall Command
+
+### Files to Touch
+
+- `cli/src/speculate/cli/cli_commands.py` — Add uninstall command and helper functions
+
+- `cli/src/speculate/cli/cli_main.py` — Add uninstall to command list and parser
+
+- `cli/tests/test_cli_commands.py` — Add uninstall tests
+
+### Tasks
+
+- [x] Add `re` import to `cli_commands.py`
+
+- [x] Add `SPECULATE_HEADER_PATTERN` regex constant:
+
+  ```python
+  SPECULATE_HEADER_PATTERN = re.compile(
+      r"^IMPORTANT: You MUST read [^\n]*development\.md[^\n]*\n"
+      r"\(This project uses Speculate project structure\.\)\n*",
+      re.MULTILINE,
+  )
+  ```
+
+- [x] Implement `_remove_speculate_header(path: Path)` helper:
+
+  - Check if file exists and contains SPECULATE_MARKER
+
+  - Use regex to remove header pattern
+
+  - If file empty after removal, delete the file
+
+  - Use cli_ui utilities for consistent logging
+
+- [x] Implement `_remove_cursor_rules(project_root: Path)` helper:
+
+  - Find all `.mdc` symlinks in `.cursor/rules/`
+
+  - Remove symlinks that point to `docs/general/agent-rules/` or are broken
+
+  - Log count of removed symlinks
+
+- [x] Implement `uninstall(force: bool = False)` command:
+
+  - Preview what will be removed (CLAUDE.md header, AGENTS.md header, symlinks,
+    settings.yml)
+
+  - Confirm with user unless `--force`
+
+  - Call helper functions to remove each component
+
+  - Log final summary
+
+  - Print note that docs/ is preserved
+
+- [x] Update `cli_main.py`:
+
+  - Import `uninstall` from cli_commands
+
+  - Add `uninstall` to `ALL_COMMANDS` list
+
+  - Add `--force` argument for uninstall subparser
+
+  - Add uninstall case in main() dispatch
+
+- [x] Add unit tests for header operations (isolated tests on temp files):
+
+  - `test_ensure_speculate_header_creates_new_file` — header added to non-existent file
+
+  - `test_ensure_speculate_header_prepends_to_existing` — header prepended to file with
+    content
+
+  - `test_ensure_speculate_header_idempotent` — no change if header already present
+
+  - `test_remove_speculate_header_preserves_content` — header removed, other content
+    preserved
+
+  - `test_remove_speculate_header_works_when_not_at_top` — header removed even when user
+    added content above it (uses `re.MULTILINE` so `^` matches any line start)
+
+  - `test_remove_speculate_header_deletes_empty_file` — file deleted if only header
+
+  - `test_remove_speculate_header_no_op_if_no_marker` — file unchanged if no marker
+    present
+
+  - `test_remove_speculate_header_no_op_if_file_missing` — no error if file doesn’t
+    exist
+
+- [x] Add integration tests for uninstall command:
+
+  - `test_uninstall_removes_header_from_claude_md`
+
+  - `test_uninstall_removes_header_from_agents_md`
+
+  - `test_uninstall_removes_cursor_symlinks`
+
+  - `test_uninstall_removes_settings_yml`
+
+  - `test_uninstall_preserves_copier_answers`
+
+  - `test_uninstall_preserves_docs_directory`
+
+  - `test_uninstall_with_force_skips_confirmation`
+
+  - `test_uninstall_nothing_to_do` — when no speculate configs present
+
+### Automated Testing Strategy
+
+- Run `speculate install` then `speculate uninstall --force`
+
+- Verify CLAUDE.md header removed but other content preserved
+
+- Verify AGENTS.md header removed but other content preserved
+
+- Verify .cursor/rules/ symlinks removed
+
+- Verify .speculate/settings.yml removed
+
+- Verify .speculate/copier-answers.yml preserved
+
+- Verify docs/ directory preserved
+
+- Run `make lint` — should pass
+
+- Run `make test` — should pass
+
+### Libraries Used
+
+No new libraries beyond Phase 1 (uses `re` from stdlib).
+
+### Open Questions (resolve now)
+
+- [x] Should uninstall require confirmation?
+  → Yes, unless `--force` is passed
+
+- [x] Should uninstall remove .speculate/copier-answers.yml?
+  → No, preserve it so user can still run `speculate update` later
+
+- [x] Should uninstall remove docs/? → No, user should remove manually if desired
+
+### Out of Scope (do NOT do now)
+
+- `--dry-run` flag (preview only mode)
+
+- Selective uninstall (e.g., only CLAUDE.md)
+
 ## Phase 4: Testing and Polish
 
 ### Files to Touch
@@ -318,6 +467,10 @@ No new libraries beyond Phase 1.
   template)
 
 - [x] Test `speculate install` creates correct symlinks
+
+- [ ] Test `speculate uninstall` removes tool configs correctly
+
+- [ ] Test `speculate uninstall` preserves docs/ and copier-answers.yml
 
 - [x] Test `speculate status` shows accurate information
 

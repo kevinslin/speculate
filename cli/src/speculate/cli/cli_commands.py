@@ -7,6 +7,7 @@ Only copier is lazy-imported (it's a large package).
 
 from __future__ import annotations
 
+import re
 import shutil
 from datetime import UTC, datetime
 from importlib.metadata import version
@@ -341,6 +342,15 @@ SPECULATE_MARKER = "Speculate project structure"
 SPECULATE_HEADER = f"""IMPORTANT: You MUST read ./docs/development.md and ./docs/docs-overview.md for project documentation.
 (This project uses {SPECULATE_MARKER}.)"""
 
+# Regex pattern to match the speculate header block wherever it appears in a file.
+# Uses re.MULTILINE so ^ matches start of any line (not just start of file).
+# Handles trailing whitespace and blank lines after the header.
+SPECULATE_HEADER_PATTERN = re.compile(
+    r"^IMPORTANT: You MUST read [^\n]*development\.md[^\n]*\n"
+    r"\(This project uses Speculate project structure\.\)[ \t]*\n*",
+    re.MULTILINE,
+)
+
 
 def _ensure_speculate_header(path: Path) -> None:
     """Ensure SPECULATE_HEADER is at the top of the file (idempotent).
@@ -364,6 +374,33 @@ def _ensure_speculate_header(path: Path) -> None:
     with atomic_output_file(path) as temp_path:
         Path(temp_path).write_text(new_content)
     print_success(f"{action} {path.name}")
+
+
+def _remove_speculate_header(path: Path) -> None:
+    """Remove the speculate header from a file (non-destructive).
+
+    If the file contains the speculate header pattern, removes it.
+    If the file becomes empty after removal, deletes the file.
+    If the file doesn't exist or has no header, does nothing.
+    """
+    if not path.exists():
+        return
+
+    content = path.read_text()
+    if SPECULATE_MARKER not in content:
+        return
+
+    # Remove the header using regex
+    new_content = SPECULATE_HEADER_PATTERN.sub("", content)
+
+    # Check if file is now empty (or just whitespace)
+    if not new_content.strip():
+        path.unlink()
+        print_success(f"Removed {path.name} (was empty after header removal)")
+    else:
+        with atomic_output_file(path) as temp_path:
+            Path(temp_path).write_text(new_content)
+        print_success(f"Removed speculate header from {path.name}")
 
 
 def _matches_patterns(
@@ -441,3 +478,113 @@ def _setup_cursor_rules(
     if skipped_count:
         msg += f" ({skipped_count} skipped by pattern)"
     print_success(msg)
+
+
+def _remove_cursor_rules(project_root: Path) -> None:
+    """Remove .cursor/rules/*.mdc symlinks that point to speculate docs.
+
+    Only removes symlinks, not regular files. Also removes broken symlinks.
+    """
+    cursor_dir = project_root / ".cursor" / "rules"
+    if not cursor_dir.exists():
+        return
+
+    removed_count = 0
+    for link_path in cursor_dir.glob("*.mdc"):
+        if link_path.is_symlink():
+            # Check if it points to our docs (or is broken)
+            try:
+                target = link_path.resolve()
+                # Remove if it points to docs/general/agent-rules/ or is broken
+                if "docs/general/agent-rules" in str(target) or not target.exists():
+                    link_path.unlink()
+                    removed_count += 1
+            except OSError:
+                # Broken symlink, remove it
+                link_path.unlink()
+                removed_count += 1
+
+    if removed_count > 0:
+        print_success(f"Removed {removed_count} symlinks from .cursor/rules/")
+
+
+def uninstall(force: bool = False) -> None:
+    """Remove tool configs installed by speculate.
+
+    Removes:
+      - Speculate header from CLAUDE.md (preserves other content)
+      - Speculate header from AGENTS.md (preserves other content)
+      - .cursor/rules/*.mdc symlinks that point to speculate docs
+      - .speculate/settings.yml
+
+    Does NOT remove:
+      - docs/ directory (remove manually if desired)
+      - .speculate/copier-answers.yml (needed for `speculate update`)
+
+    If CLAUDE.md or AGENTS.md becomes empty after header removal, the file
+    is deleted entirely.
+
+    Examples:
+      speculate uninstall           # Uninstall with confirmation
+      speculate uninstall --force   # Uninstall without confirmation
+    """
+    cwd = Path.cwd()
+
+    print_header("Uninstalling Speculate tool configs...", cwd)
+
+    # Preview what will be removed
+    changes: list[str] = []
+
+    claude_md = cwd / "CLAUDE.md"
+    if claude_md.exists() and SPECULATE_MARKER in claude_md.read_text():
+        changes.append("Remove speculate header from CLAUDE.md")
+
+    agents_md = cwd / "AGENTS.md"
+    if agents_md.exists() and SPECULATE_MARKER in agents_md.read_text():
+        changes.append("Remove speculate header from AGENTS.md")
+
+    cursor_rules = cwd / ".cursor" / "rules"
+    if cursor_rules.exists():
+        symlinks = [f for f in cursor_rules.glob("*.mdc") if f.is_symlink()]
+        if symlinks:
+            changes.append(f"Remove {len(symlinks)} symlinks from .cursor/rules/")
+
+    settings_file = cwd / SETTINGS_FILE
+    if settings_file.exists():
+        changes.append(f"Remove {SETTINGS_FILE}")
+
+    if not changes:
+        print_info("Nothing to uninstall")
+        return
+
+    rprint("[bold]Will perform:[/bold]")
+    for change in changes:
+        print_detail(change)
+    rprint()
+
+    if not force:
+        response = input("Proceed? [y/N] ").strip().lower()
+        if response != "y":
+            print_cancelled()
+            raise SystemExit(0)
+
+    rprint()
+
+    # Remove speculate header from CLAUDE.md
+    _remove_speculate_header(claude_md)
+
+    # Remove speculate header from AGENTS.md
+    _remove_speculate_header(agents_md)
+
+    # Remove .cursor/rules/ symlinks
+    _remove_cursor_rules(cwd)
+
+    # Remove .speculate/settings.yml
+    if settings_file.exists():
+        settings_file.unlink()
+        print_success(f"Removed {SETTINGS_FILE}")
+
+    rprint()
+    print_success("Uninstall complete!")
+    print_info("Note: docs/ directory preserved. Remove manually if desired.")
+    rprint()

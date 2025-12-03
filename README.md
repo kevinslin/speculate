@@ -54,7 +54,9 @@ engineering that won’t fall apart as a codebase grows in complexity.
    `shortcut:new-implementation-spec.md` to design the implementation, then
    `@shortcut:implement-spec.md` to implement, `@shortcut:commit-code.md` to commit.
 
-See the [extended example](how-it-works-a-detailed-example) for more details.
+If you are in a hurry to try things, go straight to the
+[documentation layout](#documentation-layout).
+Then see the [extended example](how-it-works-a-detailed-example) for more details.
 
 ## Thoughts on Spec-Driven Agent Coding
 
@@ -478,6 +480,13 @@ It is helpful in three use cases currently:
 - **Installation:** Agent rules are installed as references in `CLAUDE.md`, `AGENTS.md`,
   and `.cursor/rules`. This is done automatically at both initialization and update time
   and is idempotent.
+
+- **Uninstallation:** If you want to remove Speculate’s tool configurations (but keep
+  your docs), run `speculate uninstall`. This removes the Speculate header from
+  `CLAUDE.md` and `AGENTS.md` (preserving any other content you’ve added), removes the
+  `.cursor/rules/` symlinks, and removes `.speculate/settings.yml`. It does *not* remove
+  the `docs/` directory or `.speculate/copier-answers.yml` (so you can still run
+  `speculate update` later if desired).
 
 Most of the time you don’t need to run the CLI at all, and you just reference the docs
 inside your agent.
