@@ -18,22 +18,57 @@ It is likely a good fit for individual senior engineers or small teams who want 
 velocity of writing lots of code with agents but still need sustainable, good
 engineering that won’t fall apart as a codebase grows in complexity.
 
+## Quick Start
+
+1. **Install the CLI**:
+
+   Use [uv](https://docs.astral.sh/uv/):
+
+   ```bash
+   uv tool install speculate-cli
+   ```
+
+2. **Initialize Speculate in your repo:**
+
+   ```bash
+   speculate init
+   ```
+
+   This copies all general docs (rules, shortcuts, templates) into `docs/general/`,
+   creates a `docs/project/` skeleton for your project-specific specs and architecture,
+   and configures your agent tools (`CLAUDE.md`, `AGENTS.md`, `.cursor/rules/`
+   symlinks). It’s safe to run multiple times (idempotent)—it only adds to existing
+   files.
+
+3. **Create your `development.md`:** ← ⚠️ Don’t forget this step!
+
+   Before pointing agents at your repo, make sure `docs/development.md` holds your key
+   developer workflow docs.
+   You may already have this, or see
+   [`docs/development.npm.sample.md`](docs/development.npm.sample.md) for an example.
+   Agents read this file first to understand how to build and test your project.
+
+4. **Start using shortcuts:**
+
+   Reference `@shortcut:new-plan-spec.md` to plan a feature,
+   `shortcut:new-implementation-spec.md` to design the implementation, then
+   `@shortcut:implement-spec.md` to implement, `@shortcut:commit-code.md` to commit.
+
 ## Background: Does Agent Coding Really Scale?
 
-I’ve been an engineer for 20 years, mostly in startups.
-Over the past couple years I’ve used LLMs for coding heavily.
-As of summer 2025, I used LLMs heavily but usually very interactively, writing key parts
-myself and touching the code at almost every stage.
+I’ve read and written a lot of code over the past 20 years, mostly in startups.
+Over the past couple years I’ve been heavily using LLMs for coding.
+But until summer 2025, I did it very interactively, usually in Cursor, writing key parts
+myself, then LLMs to edit and debug, touching the code at almost every stage.
 
 However, then I began working with a friend on a new but complex full-stack product.
-We had a lot to build so we began experimentation on using Claude Code and Cursor agents
-aggressively to write more and more of the code.
+We had a lot to build, so we began to experiment with using Claude Code and Cursor
+agents aggressively to write more and more of the code.
 
-At first, unsurprisingly, after the codebase grew, we saw lots of slop code and
-painfully stupid bugs.
-This really isn’t surprising: the training data for LLMs includes mostly mediocre code.
-Even worse, just like with human engineers, if you let an agent ship poor code, that one
-bad bit of code encourages the next agent to repeat the problem.
+At first, unsurprisingly, as the codebase grew, we saw lots of slop code and painfully
+stupid bugs. This really isn’t surprising: the training data for LLMs includes mostly
+mediocre code. Even worse, just like with human engineers, if you let an agent ship poor
+code, that one bad bit of code encourages the next agent to repeat the problem.
 
 Without good examples and careful prompting, even the best agents perpetuate terrible
 patterns and rapidly proliferate unnecessary complexity.
@@ -71,7 +106,7 @@ For example, agents will routinely
 - Compound one poor design choice on top of another repeatedly, until it’s a Rube
   Goldberg machine where the whole design needs to be simplified immensely
 
-- Make fundamental incorrect assumptions about a problem if the you have not been
+- Make fundamental incorrect assumptions about a problem if you have not been
   sufficiently explicit (and unless prompted, not check with you about it)
 
 - Invent features that don’t exist in tools and libraries, wasting large amounts of time
@@ -213,11 +248,11 @@ The key insights for this approach are:
 - **`docs/docs-overview.md`** is a high-level roadmap of every rule, shortcut, and spec.
   The general agent rules should always point to this first.
 
-- **`docs/development.md`** is your concise project-specific setup: This should cover
-  your key developer workflows to format, lint, test, and release.
-  A simple example (`docs/development.npm.sample.md`) ships in the repo; copy or rewrite
-  it as `docs/development.md` and keep it current so agents know exactly how to build
-  and validate the project.
+- **`docs/development.md`** is your concise project-specific setup.
+  It should cover your key developer workflows to format, lint, test, and release.
+  A sample (`docs/development.npm.sample.md`) ships in the repo; copy or rewrite it as
+  `docs/development.md` and keep it current so agents know how to build and validate the
+  project.
 
 ### Folder Structure
 
@@ -542,18 +577,12 @@ in other ways for the past 2 years, we do have some take-aways:
 
 ## Installing to Claude Code, Codex, and Cursor
 
-The source of truth for all rules is `docs/general/agent-rules/`. These rules are
-consumed by different tools via their native configuration formats:
-
-| Tool | Configuration File | How Rules Are Loaded |
-| --- | --- | --- |
-| **Cursor** | `.cursor/rules/*.md` | Symlink or copy from `docs/` |
-| **Claude Code** | `CLAUDE.md` | Points to `docs/` directory |
-| **Codex** | `AGENTS.md` | Points to `docs/` directory |
+The source of truth for all rules is `docs/general/agent-rules/`. After running
+`speculate init`, configure your agent tool to load these rules.
 
 ### Cursor Setup
 
-For Cursor, create symlinks from `.cursor/rules/` to the docs:
+Create symlinks (or copies) from `.cursor/rules/` to the agent-rules docs:
 
 ```bash
 mkdir -p .cursor/rules
@@ -563,55 +592,29 @@ ln -s ../../docs/general/agent-rules/*.md .
 
 ### Claude Code and Codex Setup
 
-The root-level `CLAUDE.md` and `AGENTS.md` files point agents to read rules from
-@docs/general/agent-rules/. No additional setup needed.
+Create root-level `CLAUDE.md` and/or `AGENTS.md` files that reference the docs.
+Example `CLAUDE.md`:
+
+```markdown
+Read @docs/docs-overview.md first for project documentation.
+Follow rules in @docs/general/agent-rules/.
+```
 
 ### Automatic Workflow Activation
 
-The @automatic-shortcut-triggers.md file enables automatic shortcut triggering.
+The `@automatic-shortcut-triggers.md` rule enables automatic shortcut triggering.
 When an agent receives a request, it checks the trigger table and uses the appropriate
 shortcut from `docs/general/agent-shortcuts/`.
 
-## Agent Task Shortcuts
-
-Shortcuts in `docs/general/agent-shortcuts/` define reusable workflows.
-They are triggered automatically via @automatic-shortcut-triggers.md or can be invoked
-explicitly.
-
-### Direct Invocation
-
-You can also invoke shortcuts explicitly:
-
-- @shortcut:new-plan-spec.md — Create a new feature plan
-
-- @shortcut:new-implementation-spec.md — Create an implementation spec
-
-- @shortcut:new-validation-spec.md — Create a validation spec
-
-- @shortcut:new-research-brief.md — Create a new research brief
-
-- @shortcut:new-architecture-doc.md — Create a new architecture document
-
-- @shortcut:revise-architecture-doc.md — Revise an existing architecture document
-
-- @shortcut:implement-spec.md — Implement from an existing spec
-
-- @shortcut:precommit-process.md — Run pre-commit checks
-
-- @shortcut:commit-code.md — Prepare commit message
-
-- @shortcut:create-pr.md — Create a pull request
-
-### Automatic Triggering
-
-When you make a request, the agent should follow rules in
-@automatic-shortcut-triggers.md for matching triggers.
 For example:
 
 - “Create a plan for user profiles” → triggers @shortcut:new-plan-spec.md
 
 - “Commit my changes” → triggers @shortcut:precommit-process.md →
   @shortcut:commit-code.md
+
+You can also invoke shortcuts explicitly by referencing them (e.g., typing `@` and
+selecting `shortcut:new-plan-spec.md`).
 
 ## Feedback?
 
