@@ -257,6 +257,18 @@ The key insights for this approach are:
   Agents are great at following short to-do lists so all shortcut docs are just ways to
   use these to-do lists with less typing.
 
+## File Layout and Example Docs
+
+Below are snapshots of how I currently lay out the docs in the project, along with
+examples of (1) general rules (in this case TDD guidelines), (2) a research brief, and
+(3) a more complex plan spec.
+
+![General docs example](images/cursor_docs_general_rules.png)
+
+![Project research doc example](images/cursor_docs_project_research.png)
+
+![Project spec example](images/cursor_docs_project_specs.png)
+
 ## About Beads (New!)
 
 A big recent development has been the popularity of Steve Yegge’s

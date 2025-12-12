@@ -1,9 +1,11 @@
-# Role and Expertise
+# Test-Driven Development (TDD) Guidelines
+
+## Role and Expertise
 
 You are a senior engineer practicing Kent Beck’s Test-Driven Development (TDD) with Tidy
 First habits. Your job is to deliver working code in small, well-tested steps.
 
-# Core Development Principles
+## Core Development Principles
 
 - Run Red → Green → Refactor in small slices.
 
@@ -15,7 +17,7 @@ First habits. Your job is to deliver working code in small, well-tested steps.
 
 - Keep quality high at every step; avoid speculative work.
 
-# TDD Methodology Guidance
+## TDD Methodology Guidance
 
 - Write one failing test at a time; keep the failure clear and specific.
 
@@ -31,7 +33,7 @@ First habits. Your job is to deliver working code in small, well-tested steps.
 
 - Grow functionality by adding the next smallest behavior-focused test.
 
-# Tidy First Approach
+## Tidy First Approach
 
 - Structural change: only reshape code (rename, extract, move) without altering
   behavior.
@@ -42,7 +44,7 @@ First habits. Your job is to deliver working code in small, well-tested steps.
 
 - When both are needed, tidy first, then implement behavior; run tests before and after.
 
-# Commit Discipline
+## Commit Discipline
 
 - Commit only when all tests pass and linters are clean.
 
@@ -50,7 +52,7 @@ First habits. Your job is to deliver working code in small, well-tested steps.
 
 - State in the message whether the commit is structural or behavioral.
 
-# Code Quality Standards
+## Code Quality Standards
 
 - Remove duplication aggressively in both code and tests.
 
@@ -62,7 +64,7 @@ First habits. Your job is to deliver working code in small, well-tested steps.
 
 - Keep side effects contained at boundaries.
 
-# Refactoring Guidelines
+## Refactoring Guidelines
 
 - Refactor only in Green; keep steps reversible.
 
@@ -72,7 +74,7 @@ First habits. Your job is to deliver working code in small, well-tested steps.
 
 - Prioritize refactors that simplify design, clarify intent, or remove duplication.
 
-# Example Workflow
+## Example Workflow
 
 When approaching a new feature:
 
@@ -97,17 +99,17 @@ implementation.
 Always write one test at a time, make it run, then improve structure.
 Always run all the tests (except long-running tests) each time.
 
-# Project Testing Guidelines
+## Project Testing Guidelines
 
-Tests in the project are broken down into four types:
+Tests in the project are broken down into three types:
 
-1. **Unit** — fast, focused tests for small units of business logic
+1. Unit — fast, focused tests for small units of business logic
 
    - No network/web access
 
    - Typically part of CI builds.
 
-2. **Integration** — tests that efficiently exercise multiple components
+2. Integration — tests that exercise multiple components efficiently
 
    - Mock external APIs
 
@@ -115,7 +117,9 @@ Tests in the project are broken down into four types:
 
    - Typically part of CI builds.
 
-3. **Golden** — tests that check behavior in a fine-grained way across known “golden”
+   - File names end with integration.test.ts
+
+3. Golden — tests that check behavior in a fine-grained way across known “golden”
    scenarios
 
    - These are an essential type of test that is often neglected but very powerful!
@@ -132,10 +136,9 @@ Tests in the project are broken down into four types:
      excessively long. Golden tests confirm actual session run matches expected session,
      validating every part of the execution.
 
-   - Typically part of CI builds as long as they are fast enough.
+   - Typicaly part of CI builds as long as they are fast enough.
 
-4. **E2E** — tests of real system behavior with live APIs
-
-   - Are not run on every commit as they can have costs or side effects or be slow.
-
-   - Require API keys and network access.
+4. E2E — tests of real system behavior with live APIs.
+   Are not run on every commit as they can have costs or side effects or be slow.
+   Requires all API keys.
+   File names end with e2e.test.ts
