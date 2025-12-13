@@ -1,34 +1,45 @@
 # Lessons from 500K Lines of Spec-Driven Agent Coding
 
-Joshua Levy ▪ 2025-12-10
+Joshua Levy ▪ 2025-12-11
 
 👉 *You can try this out on your own project!
 The **[speculate](https://github.com/jlevy/speculate)** repo has all the prompts and
 templates discussed below and a CLI to copy them into your repo.
 You can also see [these slides](speculate_slides.html) from a talk I gave about this.*
 
-## Can You Trust Agents to Write Most of Your Code?
+## Can Agents Write a Complex Production Application?
 
-In the past few weeks, I’ve been doing a *lot* of agent coding and wanted to share some
-learnings after building a fairly complex product that is almost entirely agent coded.
+Recently, I’ve been doing a *lot* of agent coding.
+I’d like share some learnings after building a fairly complex product that is almost
+entirely agent coded.
+The experience has significantly changed how I now code with LLMs and evolved my views
+on what it means to be a software engineer in 2026.
+
 It’s a fairly complex full-stack web app,
 [AI Trade Arena](https://www.aitradearena.com/), which we launched last week and was
 [#1 on HN](https://news.ycombinator.com/item?id=46154491) for the day.
-
-This was built with two developers ([Kam](https://x.com/kamleung911) and
+It was built with two developers ([Kam](https://x.com/kamleung911) and
 [me](https://x.com/ojoshe)) with about 250K lines of TypeScript and 250K lines of
 Markdown docs. It is about 95% agent-written code and 90% agent-written specs.
 
-I’m a longtime startup engineer and over the past couple years I’ve been heavily using
-LLMs for coding. But until summer 2025, I did it very interactively, usually in Cursor,
-writing key parts myself, then using LLMs to fill in parts and to debug.
-I’m a pretty picky code reviewer and usually ended up touching the code at almost every
-stage.
+The process has involved some painful experimentation, quite a few (at least to me)
+non-obvious tricks, and a few new mental models for coding.
+This post and prompt repository are an attempt to share them with you.
+
+## About Me
+
+I’m a longtime startup engineer and founder.
+Over the past couple years, I’ve been heavily using LLMs for coding.
+But until around September 2025, I did it very interactively, usually in Cursor, writing
+key parts myself, then using LLMs to fill in parts and to debug.
+I’m a picky code reviewer so I usually ended up touching the code at almost every stage.
+
+## About the Codebase
 
 As a greenfield effort, this was a good opportunity to try new development processes.
 We wanted agents to do as much as possible.
 But unlike a vibe-coded hackathon project, we wanted this to be a maintainable codebase
-we could use for a real product.
+we could use and maintain as a real product.
 It’s a full-stack web app with a React web UI and a backend agent framework with
 [Convex](https://github.com/get-convex) for the backend.[^1]
 
@@ -270,7 +281,7 @@ The key insights for this approach are:
 
 ## About Beads (New!)
 
-A big recent development has been the popularity of Steve Yegge’s
+A significant recent development has been the popularity of Steve Yegge’s
 [beads tool](https://github.com/steveyegge/beads).
 
 His big insight with beads is that we need light-weight, token-friendly issue tracking,
