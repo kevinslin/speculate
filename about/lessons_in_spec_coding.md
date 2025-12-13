@@ -2,9 +2,9 @@
 
 Joshua Levy ▪ 2025-12-10
 
-👉 *You can try all this out!
+👉 *You can try this out on your own project!
 The **[speculate](https://github.com/jlevy/speculate)** repo has all the prompts and
-templates discussed below.
+templates discussed below and a CLI to copy them into your repo.
 You can also see [these slides](speculate_slides.html) from a talk I gave about this.*
 
 ## Can You Trust Agents to Write Most of Your Code?
@@ -38,7 +38,8 @@ With LLMs, “slop” is not so much a description of content as it is a natural
 entropy in physics or the force of gravity.
 
 Objects tend to fall to earth unless you engineer ways to prevent that.
-Coding agents trend toward the center of gravity of their coding training data.
+Coding agents trend toward the center of gravity of their coding training data unless
+you build structures to guide it in other directions.
 
 Unsurprisingly, as we began using Claude Code and Cursor agents aggressively to write
 more and more of the code, we saw lots of slop: numerous poor stylistic choices that
@@ -267,18 +268,6 @@ The key insights for this approach are:
   Agents are great at following short to-do lists so all shortcut docs are just ways to
   use these to-do lists with less typing.
 
-## File Layout and Example Docs
-
-Below are snapshots of how I currently lay out the docs in the project, along with
-examples of (1) general rules (in this case TDD guidelines), (2) a research brief, and
-(3) a more complex plan spec.
-
-![General docs example](images/cursor_docs_general_rules.png)
-
-![Project research doc example](images/cursor_docs_project_research.png)
-
-![Project spec example](images/cursor_docs_project_specs.png)
-
 ## About Beads (New!)
 
 A big recent development has been the popularity of Steve Yegge’s
@@ -302,6 +291,24 @@ with beads, so you don’t have to rewrite such context over and over.
 I’ve started integrating beads into the existing spec workflows to track all
 implementation work and it seems to complement the other docs it pretty well so far.
 (I’ve only been doing this for a few days so will update this soon.)
+
+## File Layout and Example Docs
+
+Below are snapshots of how I currently lay out the docs in the project, along with
+examples of (1) general rules (in this case TDD guidelines), (2) a research brief, and
+(3) a more complex plan spec.
+
+### General Docs: Rules Example
+
+![General docs example](images/cursor_docs_general_rules.png)
+
+### Project Docs: Research Brief Example
+
+![Project research doc example](images/cursor_docs_project_research.png)
+
+### Project Docs: Spec Example
+
+![Project spec example](images/cursor_docs_project_specs.png)
 
 ## More Take-Aways
 
