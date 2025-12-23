@@ -51,39 +51,59 @@ bd doctor       # Check installation health
 bd doctor --fix # Fix any setup issues
 ```
 
-**Git merge driver configuration (required for each clone):**
+### Sync Branch Configuration
 
-The `.gitattributes` file configures beads JSONL files to use a custom merge driver,
-but the driver must be registered in your local git config. Without this, git merge
-conflicts won't be auto-resolved. Run this after cloning:
+Beads can commit issue changes to a dedicated sync branch (recommended for team
+projects). This uses git worktrees internally.
+
+**IMPORTANT:** Never use `main` as the sync branch - it locks `main` in a worktree,
+preventing normal `git checkout main`. Use a dedicated branch like `beads-sync`.
+
+**Check current config:**
+```bash
+bd config get sync.branch
+```
+
+**For new projects** - add to `.beads/config.yaml`:
+```yaml
+sync-branch: 'beads-sync'
+```
+
+**For existing projects with wrong sync branch:**
+```bash
+bd config set sync.branch beads-sync
+bd daemon stop && bd daemon start
+```
+
+**If you see “fatal: ‘main’ is already used by worktree”:**
+```bash
+# Fix: remove beads worktrees and change sync branch
+rm -rf .git/beads-worktrees .git/worktrees/beads-*
+git worktree prune
+bd config set sync.branch beads-sync
+bd daemon stop && bd daemon start
+```
+
+### Git Merge Driver (required for each clone)
+
+The `.gitattributes` file configures beads JSONL files to use a custom merge driver, but
+the driver must be registered in your local git config:
 
 ```bash
 git config merge.beads.driver "bd merge %A %O %A %B"
 git config merge.beads.name "bd JSONL merge driver"
 ```
 
-This enables intelligent 3-way merging of `.beads/issues.jsonl`:
-- Matches issues by identity (id + created_at + created_by)
-- Applies field-specific merge rules (e.g., newer timestamps win)
-- Combines dependencies and labels
-- Outputs conflict markers only for unresolvable conflicts
+Verify with: `bd doctor | grep "Git Merge Driver"` (should show checkmark)
 
-Verify with: `bd doctor | grep "Git Merge Driver"` (should show ✓)
-
-**SQLite WAL mode errors (common in containers/VMs):**
+### SQLite WAL Mode Errors (common in containers/VMs)
 
 If you see `failed to enable WAL mode: sqlite3: locking protocol`, use JSONL-only mode:
 
 ```bash
-# Add to config permanently (recommended)
 echo "no-db: true" >> .beads/config.yaml
-
-# Or use --no-db flag for each command
-bd --no-db status
+# Or use --no-db flag: bd --no-db status
 ```
-
-`--no-db` mode reads/writes directly to `.beads/issues.jsonl` without SQLite.
-This is fully functional for all workflows.
 
 ### Issue Types
 
@@ -98,8 +118,6 @@ This is fully functional for all workflows.
 - `chore` - Maintenance (dependencies, tooling)
 
 - `merge-request` - Code review / merge request
-
-- `molecule` - Work template (advanced)
 
 ### Priorities
 
@@ -140,18 +158,6 @@ Use `0-4` or `P0-P4` format (NOT "high"/"medium"/"low"):
    git commit -m "..."     # Commit code changes
    ```
 
-### Sync & Collaboration
-
-bd automatically syncs with git:
-
-- Exports to `.beads/issues.jsonl` after CRUD operations (5s debounce)
-
-- Imports from JSONL when newer than DB (e.g., after `git pull`)
-
-- Run `bd sync --from-main` at session end (especially for ephemeral branches)
-
-- Check sync status: `bd sync --status`
-
 ### Useful Commands
 
 - `bd ready` - Show issues ready to work (no blockers)
@@ -180,14 +186,10 @@ bd automatically syncs with git:
 
 - Store AI planning docs in `history/` directory
 
-- Run `bd <cmd> --help` to discover available flags
-
 - Run `bd sync --from-main` at session end
 
 - Do NOT use "high"/"medium"/"low" for priorities (use 0-4 or P0-P4)
 
 - Do NOT use external issue trackers
 
-- Do NOT duplicate tracking systems
-
-- Do NOT clutter repo root with planning documents
+- Do NOT use `main` as the sync branch (use `beads-sync`)
