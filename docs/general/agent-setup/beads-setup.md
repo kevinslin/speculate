@@ -3,30 +3,68 @@
 **IMPORTANT**: This project uses **bd (beads)** for ALL issue tracking.
 Do NOT use markdown TODOs or other ad-hoc issue tracking methods.
 
-**Run this now** to get an overview of `bd`:
+**Run this now** to check if `bd` is available:
 
 ```bash
 bd status || echo "bd not installed"
 ```
 
 **If bd is not installed:**
+
+Note: `npm install -g @beads/bd` and `go install` methods exist but typically fail in
+cloud environments (Claude Code web, containers) due to network restrictions.
+Use the direct download method:
+
 ```bash
-go install github.com/steveyegge/beads/cmd/bd@latest
-export PATH="$PATH:$HOME/go/bin" # Required each session
+# Detect platform
+OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+ARCH=$(uname -m)
+[ "$ARCH" = "x86_64" ] && ARCH="amd64"
+[ "$ARCH" = "aarch64" ] && ARCH="arm64"
+
+# Get latest version from GitHub API
+BD_VERSION=$(curl -sI https://github.com/steveyegge/beads/releases/latest | \
+  grep -i "^location:" | sed 's/.*tag\///' | tr -d '\r\n')
+
+# Download and install the binary
+curl -fsSL -o /tmp/beads.tar.gz \
+  "https://github.com/steveyegge/beads/releases/download/${BD_VERSION}/beads_${BD_VERSION#v}_${OS}_${ARCH}.tar.gz"
+tar -xzf /tmp/beads.tar.gz -C /tmp
+mkdir -p ~/.local/bin
+cp /tmp/bd ~/.local/bin/
+chmod +x ~/.local/bin/bd
+export PATH="$HOME/.local/bin:$PATH"
 bd prime   # Get workflow context
 ```
 
-**If bd says `Error: no beads database found` it requires one-time setup:**
+For troubleshooting, see: https://github.com/steveyegge/beads/releases
+
+**If bd says `Error: no beads database found`:**
 ```bash
 bd init
-bd prime  # Get workflow context
+bd prime
 ```
 
 **If you encounter other errors:**
+```bash
+bd doctor       # Check installation health
+bd doctor --fix # Fix any setup issues
 ```
-bd doctor  # Check installation health
-bd doctor --fix  # Fix any setup issues
+
+**SQLite WAL mode errors (common in containers/VMs):**
+
+If you see `failed to enable WAL mode: sqlite3: locking protocol`, use JSONL-only mode:
+
+```bash
+# Add to config permanently (recommended)
+echo "no-db: true" >> .beads/config.yaml
+
+# Or use --no-db flag for each command
+bd --no-db status
 ```
+
+`--no-db` mode reads/writes directly to `.beads/issues.jsonl` without SQLite.
+This is fully functional for all workflows.
 
 ### Issue Types
 
@@ -113,24 +151,24 @@ bd automatically syncs with git:
 
 ### Important Rules
 
-- ✅ Use bd for ALL task tracking
+- Use bd for ALL task tracking
 
-- ✅ Always use `--json` flag for programmatic use
+- Always use `--json` flag for programmatic use
 
-- ✅ Link discovered work with `discovered-from` dependencies
+- Link discovered work with `discovered-from` dependencies
 
-- ✅ Check `bd ready` before asking “what should I work on?”
+- Check `bd ready` before asking “what should I work on?”
 
-- ✅ Store AI planning docs in `history/` directory
+- Store AI planning docs in `history/` directory
 
-- ✅ Run `bd <cmd> --help` to discover available flags
+- Run `bd <cmd> --help` to discover available flags
 
-- ✅ Run `bd sync --from-main` at session end
+- Run `bd sync --from-main` at session end
 
-- ❌ Do NOT use "high"/"medium"/"low" for priorities (use 0-4 or P0-P4)
+- Do NOT use "high"/"medium"/"low" for priorities (use 0-4 or P0-P4)
 
-- ❌ Do NOT use external issue trackers
+- Do NOT use external issue trackers
 
-- ❌ Do NOT duplicate tracking systems
+- Do NOT duplicate tracking systems
 
-- ❌ Do NOT clutter repo root with planning documents
+- Do NOT clutter repo root with planning documents
